@@ -33,18 +33,16 @@ router.post("/", async (req, res) => {
 
 // delete a user
 router.delete("/", auth, async (req, res) => {
-  try {
-    const checkUser = await User.findOne({ _id: req.user._id });
-    if (!checkUser) return res.status(404).send("User not found");
-    if (checkUser.isDemo) {
-      return res.status(403).send("You can't delete a demo user");
-    }
-    const user = await User.findOneAndDelete({ _id: req.user._id });
-    await Post.deleteMany({ userId: req.user._id });
-    return res.status(200).send(user);
-  } catch (ex) {
-    return res.status(500).send("Internal server error");
+  const checkUser = await User.findOne({ _id: req.user._id });
+  if (!checkUser) {
+    return res.status(404).send("User not found");
   }
+  if (checkUser.isDemo) {
+    return res.status(403).send("Cannot delete demo user");
+  }
+  const user = await User.findOneAndDelete({ _id: req.user._id });
+  await Post.deleteMany({ userId: req.user._id });
+  return res.status(200).send(user);
 });
 
 // update a user
