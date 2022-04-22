@@ -38,11 +38,11 @@ router.delete("/", auth, async (req, res) => {
     return res.status(404).send("User not found");
   }
   if (checkUser.isDemo) {
-    return res.status(401).send("Cannot delete demo user");
+    return res.status(403).send("Cannot delete demo user");
   }
   const user = await User.findOneAndDelete({ _id: req.user._id });
   await Post.deleteMany({ userId: req.user._id });
-  return res.status(200).send(user);
+  res.status(200).send(user);
 });
 
 // update a user
