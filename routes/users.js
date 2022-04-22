@@ -33,16 +33,20 @@ router.post("/", async (req, res) => {
 
 // delete a user
 router.delete("/", auth, async (req, res) => {
-  const checkUser = await User.findOne({ _id: req.user._id });
-  if (!checkUser) {
-    return res.status(404).send("User not found");
+  try {
+    const checkUser = await User.findOne({ _id: req.user._id });
+    if (!checkUser) {
+      return res.status(404).send("User not found");
+    }
+    if (checkUser.email === "demo@omoide.com") {
+      return res.status(403).send("Cannot delete demo user");
+    }
+    const user = await User.findOneAndDelete({ _id: req.user._id });
+    await Post.deleteMany({ userId: req.user._id });
+    return res.status(200).send(user);
+  } catch (ex) {
+    return res.status(500).send("Internal server error");
   }
-  if (checkUser.isDemo) {
-    return res.status(403).send("Cannot delete demo user");
-  }
-  const user = await User.findOneAndDelete({ _id: req.user._id });
-  await Post.deleteMany({ userId: req.user._id });
-  res.status(200).send(user);
 });
 
 // update a user
