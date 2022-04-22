@@ -13,8 +13,8 @@ router.post("/", auth, async (req, res) => {
       let postCount = await Post.countDocuments({
         userId: req.user.userId,
       });
-      if (postCount >= 3) {
-        return res.status(400).send("You can only create 3 memories");
+      if (postCount >= 15) {
+        return res.status(400).send("You can only create 15 memories");
       }
     }
     const { error } = validatePost(req.body);
