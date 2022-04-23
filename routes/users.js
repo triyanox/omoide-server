@@ -25,7 +25,7 @@ router.post("/", async (req, res) => {
     res
       .header("x-auth-token", token)
       .header("access-control-expose-headers", "x-auth-token")
-      .send(_.pick(user, ["_id", "name", "email", "link"]));
+      .send(_.pick(user, ["_id", "name", "email", "link", "isDemo"]));
   } catch (ex) {
     return res.status(500).send("Internal server error");
   }
@@ -43,7 +43,9 @@ router.delete("/", auth, async (req, res) => {
     }
     const user = await User.findOneAndDelete({ _id: req.user._id });
     await Post.deleteMany({ userId: req.user._id });
-    return res.status(200).send(user);
+    return res
+      .status(200)
+      .send(_.pick(user, ["_id", "name", "email", "link", "isDemo"]));
   } catch (ex) {
     return res.status(500).send("Internal server error");
   }
@@ -82,7 +84,7 @@ router.put("/", auth, async (req, res) => {
       res
         .header("x-auth-token", token)
         .header("access-control-expose-headers", "x-auth-token")
-        .send(user)
+        .send(_.pick(user, ["_id", "name", "email", "link", "isDemo"]))
         .status(200);
     }
   } catch (ex) {
@@ -108,7 +110,9 @@ router.get("/user/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).send("User not found");
-    return res.status(200).send(user);
+    return res
+      .status(200)
+      .send(_.pick(user, ["_id", "name", "email", "link", "isDemo"]));
   } catch {
     return res.status(500).send("Internal server error");
   }
